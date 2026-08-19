@@ -74,8 +74,6 @@ blockquote {
 }
 
 blockquote p {
-    font-size: 14px;
-    color: #666666;
     line-height: 1.7;
     margin: 4px 0;
 }
@@ -83,22 +81,23 @@ blockquote p {
 ul {
     padding-left: 1.4em;
     margin: 10px 0;
+    font-size: 15px;
+    color: #3f3f3f;
 }
 
 ol {
     padding-left: 1.6em;
     margin: 10px 0;
+    font-size: 15px;
+    color: #3f3f3f;
 }
 
 li {
-    font-size: 15px;
-    color: #3f3f3f;
     line-height: 1.75;
     margin: 4px 0;
 }
 
 li p {
-    font-size: 15px;
     margin: 4px 0;
 }
 
@@ -112,7 +111,7 @@ pre {
     margin: 12px 0;
     white-space: pre-wrap;
     word-break: break-all;
-    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-family: Consolas,Menlo,monospace;
 }
 
 pre code {
@@ -130,7 +129,7 @@ code {
     font-size: 13px;
     padding: 2px 4px;
     border-radius: 3px;
-    font-family: Consolas, Monaco, "Courier New", monospace;
+    font-family: Consolas,Menlo,monospace;
 }
 
 table {
@@ -138,6 +137,7 @@ table {
     margin: 14px 0;
     width: 100%;
     font-size: 14px;
+    color: #3f3f3f;
 }
 
 th {
@@ -145,13 +145,11 @@ th {
     border: 1px solid #dcdcdc;
     padding: 6px 10px;
     font-weight: bold;
-    color: #3f3f3f;
 }
 
 td {
     border: 1px solid #dcdcdc;
     padding: 6px 10px;
-    color: #3f3f3f;
 }
 
 img {

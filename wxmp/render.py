@@ -103,8 +103,13 @@ def plain_text(html: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def make_digest(html: str, limit: int = 110) -> str:
+def make_digest(html: str, max_bytes: int = 117) -> str:
+    """按 utf-8 字节数截断生成摘要（微信 digest 按字节限制，约 120 字节，
+    实测 167 字节报 45004、88 字节通过；117 + "…"3 字节 = 120）。"""
     text = plain_text(html)
-    if len(text) <= limit:
-        return text
-    return text[:limit] + "…"
+    buf = ""
+    for ch in text:
+        if len((buf + ch).encode("utf-8")) > max_bytes:
+            return buf + "…"
+        buf += ch
+    return buf

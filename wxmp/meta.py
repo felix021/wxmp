@@ -10,6 +10,7 @@ from wxmp.errors import ValidationError
 TITLE_MAX = 32
 AUTHOR_MAX = 16
 DIGEST_MAX = 120
+DIGEST_BYTES_MAX = 120  # 实测微信按字节限制：167 字节报 45004，88 字节通过
 CONTENT_CHAR_MAX = 20000
 CONTENT_WARN = 18000
 CONTENT_BYTES_MAX = 1024 * 1024
@@ -73,6 +74,12 @@ def validate(meta: ArticleMeta, content_html: str) -> list[str]:
         raise ValidationError(f"作者名 {len(meta.author)} 字，超过微信上限 {AUTHOR_MAX} 字")
     if len(meta.digest) > DIGEST_MAX:
         raise ValidationError(f"摘要 {len(meta.digest)} 字，超过微信上限 {DIGEST_MAX} 字")
+    digest_bytes = len(meta.digest.encode("utf-8"))
+    if digest_bytes > DIGEST_BYTES_MAX:
+        raise ValidationError(
+            f"摘要 {digest_bytes} 字节，超过微信实际限制约 {DIGEST_BYTES_MAX} 字节"
+            f"（微信按字节计，混合中英文时字符数会明显少于 120 字）"
+        )
     n_chars = len(content_html)
     if n_chars > CONTENT_CHAR_MAX:
         raise ValidationError(

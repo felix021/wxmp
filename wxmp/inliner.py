@@ -132,7 +132,8 @@ def _prop_rank(name: str) -> tuple[int, str]:
 
 
 def _serialize(decls: dict) -> str:
-    return "; ".join(f"{k}:{decls[k]}" for k in sorted(decls, key=_prop_rank))
+    # 紧凑格式（";" 无空格）：微信 2 万字符上限下，内联样式体积是稀缺资源
+    return ";".join(f"{k}:{decls[k]}" for k in sorted(decls, key=_prop_rank))
 
 
 def inline_css(html: str, css: str, *, on_warning=None) -> str:

@@ -44,11 +44,14 @@ def test_apply_theme_end_to_end():
     assert 'style="color:red"' in out
 
 
-def test_digest_from_rendered_text():
+def test_digest_byte_limit():
     html = "<h1>标题</h1><p>" + "正" * 200 + "</p>"
-    d = make_digest(html, limit=10)
-    assert d == "标 题 正" + "正" * 7 + "…" or d.endswith("…")
-    assert "正" in d and len(d) <= 12
+    d = make_digest(html, max_bytes=30)
+    assert d.endswith("…")
+    assert len(d.encode("utf-8")) <= 33  # 30 + "…"3 字节
+    # 中英混合：ASCII 多时字符数更多
+    d2 = make_digest("<p>" + "a" * 500 + "</p>", max_bytes=30)
+    assert d2 == "a" * 30  # 未超限时无省略号
 
 
 def test_highlight_unknown_lang_fallback():
