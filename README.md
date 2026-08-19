@@ -110,3 +110,7 @@ wxmp push x.md --output-content out.html   # 另存最终 content，便于排查
 ```
 
 模块结构：`cli.py`（命令）→ `pipeline.py`（push/preview 共用编排）→ `render.py`（markdown-it-py + Pygments 内联高亮）/`inliner.py`（CSS 内联引擎）/`images.py`（图片归一化转传）→ `wechat.py`（API 客户端 + stable_token 缓存）。
+
+## License
+
+MIT
