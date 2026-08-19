@@ -1,0 +1,107 @@
+/* wxmp 内置主题 plain —— 极简（无底色无装饰，纯排版） */
+
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1.4;
+    margin: 24px 0 12px;
+}
+
+h2 {
+    font-size: 19px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1.4;
+    margin: 20px 0 10px;
+}
+
+h3, h4, h5, h6 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #000000;
+    line-height: 1.4;
+    margin: 16px 0 8px;
+}
+
+p {
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.8;
+    margin: 10px 0;
+}
+
+strong {
+    font-weight: bold;
+}
+
+del, s {
+    text-decoration: line-through;
+    color: #999999;
+}
+
+a {
+    color: #0066cc;
+    text-decoration: underline;
+}
+
+blockquote {
+    margin: 12px 0;
+    padding: 2px 14px;
+    border-left: 3px solid #cccccc;
+    color: #666666;
+}
+
+li {
+    font-size: 15px;
+    color: #333333;
+    line-height: 1.8;
+    margin: 3px 0;
+}
+
+pre {
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 10px 14px;
+    border: 1px solid #dddddd;
+    border-radius: 3px;
+    margin: 12px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+}
+
+code {
+    font-size: 13px;
+    font-family: Consolas, Monaco, "Courier New", monospace;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+}
+
+th {
+    border: 1px solid #cccccc;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+td {
+    border: 1px solid #cccccc;
+    padding: 5px 10px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 12px auto;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #cccccc;
+    margin: 18px 0;
+}

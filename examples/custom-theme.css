@@ -1,0 +1,127 @@
+/* wxmp 自定义主题模板
+ *
+ * 用法: wxmp preview x.md --theme custom-theme.css
+ * 所有样式会被内联到每个元素的 style 属性（微信会过滤 class/<style> 标签）。
+ *
+ * 支持的选择器: tag / .class / tag.class / .a.b / 后代(A B) / 子代(A > B) / 逗号组
+ * 不支持: id(#)、属性[]、伪类(:)、兄弟组合器(+ ~)、@规则
+ *
+ * 注意: 同一元素避免混用简写与长写属性（如同时写 margin 和 margin-top）。
+ * 代码块的背景色需与 code_style 匹配：浅色样式（default/friendly）配浅底，
+ * 暗色样式（monokai/dracula）配暗底，token 颜色由 pygments 决定。
+ */
+
+p {
+    font-size: 16px;
+    color: #2f2f2f;
+    line-height: 1.8;
+    margin: 12px 0;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #1f2d3d;
+    margin: 24px 0 12px;
+}
+
+h2 {
+    font-size: 19px;
+    font-weight: bold;
+    color: #1f2d3d;
+    margin: 20px 0 10px;
+    border-left: 4px solid #42b983;
+    padding: 0 0 0 10px;
+}
+
+h3 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #1f2d3d;
+    margin: 16px 0 8px;
+}
+
+strong {
+    color: #42b983;
+    font-weight: bold;
+}
+
+del, s {
+    text-decoration: line-through;
+    color: #999999;
+}
+
+a {
+    color: #42b983;
+    text-decoration: none;
+    border-bottom: 1px dashed #42b983;
+}
+
+blockquote {
+    margin: 14px 0;
+    padding: 8px 14px;
+    background-color: #f3faf6;
+    border-left: 3px solid #42b983;
+    color: #556066;
+}
+
+pre {
+    font-size: 13px;
+    line-height: 1.6;
+    background-color: #282c34;
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin: 14px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: Consolas, Monaco, monospace;
+}
+
+code {
+    background-color: #eef1f4;
+    color: #c7254e;
+    font-size: 13px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, monospace;
+}
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 13px;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 14px 0;
+    width: 100%;
+    font-size: 14px;
+}
+
+th {
+    background-color: #f3faf6;
+    border: 1px solid #d9e6df;
+    padding: 6px 10px;
+    font-weight: bold;
+}
+
+td {
+    border: 1px solid #d9e6df;
+    padding: 6px 10px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 12px auto;
+    border-radius: 6px;
+}
+
+hr {
+    border: none;
+    border-top: 1px dashed #d9e6df;
+    margin: 20px 0;
+}

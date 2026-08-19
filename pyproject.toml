@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wxmp"
+version = "0.1.0"
+description = "把 Markdown/HTML 文章推送到微信公众号草稿箱的命令行工具"
+requires-python = ">=3.10"
+dependencies = [
+    "markdown-it-py>=3",
+    "mdit-py-plugins>=0.4",
+    "PyYAML",
+    "Pygments",
+    "beautifulsoup4",
+    "tinycss2",
+    "Pillow",
+    "requests",
+]
+
+[project.scripts]
+wxmp = "wxmp.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["wxmp*"]
+
+[tool.setuptools.package-data]
+wxmp = ["themes/*.css"]
