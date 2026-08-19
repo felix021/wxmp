@@ -49,12 +49,13 @@ class WeChatClient:
                 return self._token
         resp = self.session.post(
             f"{API_BASE}/cgi-bin/stable_token",
-            json={
+            data=json.dumps({
                 "grant_type": "client_credential",
                 "appid": self.appid,
                 "secret": self.secret,
                 "force_refresh": bool(force),
-            },
+            }, ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
             timeout=15,
         )
         data = self._check_json(resp)
@@ -100,6 +101,8 @@ class WeChatClient:
     def _check_json(self, resp: requests.Response) -> dict:
         if resp.status_code >= 500:
             raise WeChatError(-1, f"HTTP {resp.status_code}（微信服务端错误），请稍后重试")
+        # 微信返回 UTF-8 JSON 但常不带 charset 声明，requests 会按 Latin-1 解码导致乱码
+        resp.encoding = "utf-8"
         try:
             return resp.json()
         except ValueError:
@@ -115,9 +118,16 @@ class WeChatClient:
                  _retried: bool = False) -> dict:
         base_params = dict(params or {})
         base_params["access_token"] = self.get_access_token()
+        # 关键：微信要求 JSON 直接传 UTF-8 字符串，勿用 \uXXXX 转义
+        # （requests 的 json= 默认 ensure_ascii=True，中文会变 二 字面文本）
+        data = None
+        headers = None
+        if json_body is not None:
+            data = json.dumps(json_body, ensure_ascii=False).encode("utf-8")
+            headers = {"Content-Type": "application/json"}
         resp = self.session.request(
             method, f"{API_BASE}{path}", params=base_params,
-            json=json_body, files=files, timeout=30,
+            data=data, headers=headers, files=files, timeout=30,
         )
         data = self._check_json(resp)
         errcode = data.get("errcode", 0)

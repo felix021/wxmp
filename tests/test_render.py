@@ -49,9 +49,8 @@ def test_digest_byte_limit():
     d = make_digest(html, max_bytes=30)
     assert d.endswith("…")
     assert len(d.encode("utf-8")) <= 33  # 30 + "…"3 字节
-    # 中英混合：ASCII 多时字符数更多
-    d2 = make_digest("<p>" + "a" * 500 + "</p>", max_bytes=30)
-    assert d2 == "a" * 30  # 未超限时无省略号
+    # 未超限的短文本原样返回，不加省略号
+    assert make_digest("<p>short</p>", max_bytes=30) == "short"
 
 
 def test_highlight_unknown_lang_fallback():

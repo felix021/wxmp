@@ -87,3 +87,19 @@ def test_non_json_response(tmp_path):
     client = make_client(tmp_path, api_responses=[resp])
     with pytest.raises(WeChatError, match="非 JSON"):
         client.draft_count()
+
+
+def test_request_body_not_unicode_escaped(tmp_path):
+    """微信要求 JSON 直接传 UTF-8（勿 \\uXXXX 转义，否则中文变字面转义文本）。"""
+    client = make_client(
+        tmp_path,
+        api_responses=[FakeResponse({"errcode": 0, "media_id": "M"})],
+    )
+    client.draft_add({"title": "中文标题", "content": "<p>正文</p>",
+                      "thumb_media_id": "T"})
+    kwargs = client.session.request.call_args.kwargs
+    body = kwargs["data"]
+    assert isinstance(body, bytes)
+    assert "中文标题".encode("utf-8") in body
+    assert b"\\u" not in body
+    assert kwargs["headers"]["Content-Type"] == "application/json"
