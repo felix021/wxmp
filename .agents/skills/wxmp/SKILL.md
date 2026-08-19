@@ -36,6 +36,8 @@ wxmp push article.md --update=<media_id>       # 指定草稿；id 以 - 开头�
 | `wxmp push <file> --output-content out.html` | 另存最终 content 排查差异 |
 | `wxmp preview <file> [-o out] [--width 375]` | 手机宽度本地预览（不联网） |
 | `wxmp drafts count / list / delete <media_id>` | 草稿箱管理；验证配置是否通畅跑 `drafts count` |
+| `wxmp send <media_id\|latest> [--tag N]` | **群发**给粉丝（订阅号每天 1 次，不可撤回，草稿发后自动删除；仅认证账号） |
+| `wxmp publish <media_id\|latest>` / `wxmp publish x --status=<id>` | **发布**到公众号主页（不推粉丝、不占群发次数）/ 查询发布状态 |
 | `wxmp themes` / `wxmp themes --code-styles` | 内置主题（default/plain）/ pygments 代码样式 |
 | `wxmp config show` | 查看配置 |
 
@@ -66,6 +68,15 @@ HTML 文件同样支持，元数据走 CLI 参数。图片：本地路径/外链
 2. **标题 ≤32 字**、**作者 ≤16 字**、**摘要 ≤120 字节**（微信按字节计，中英混合时字符数远少于 120；工具按字节自动截断）。
 3. 未认证账号：正文超链接会被剥成纯文本；遇 48001 = 账号无草稿接口权限。
 4. 素材被群发后会自动移出草稿箱。
+5. **发送 API 无定时参数**：定时发送用本地调度。本机方案（atd 未装、用户级 systemd 按 UTC 解析 OnCalendar，两个坑都踩过）：
+   ```bash
+   export XDG_RUNTIME_DIR=/run/user/$(id -u)
+   systemd-run --user --on-calendar="2026-08-20 09:50:00 Asia/Shanghai" --unit=wxmp-send-<名> \
+     bash -c '<wxmp绝对路径> send -- <media_id> > <日志> 2>&1'
+   systemctl --user list-timers | grep wxmp        # 核对触发时间（时区！）
+   systemctl --user stop wxmp-send-<名>.timer       # 取消
+   ```
+   注意用具体 media_id（latest 可能被新草稿顶掉）；后台若开「API 群发保护」会进管理员审批（89504）。
 
 ## 排版定制
 
