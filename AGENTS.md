@@ -43,7 +43,7 @@ wechat.py              WeChatClient：stable_token 本地缓存、40001/42001 �
 
 ## 配置与数据（本机已就绪，勿动）
 
-- `~/.config/wxmp/config.json`（600）：appid/secret/默认项/`api_proxy=http://<PROXY_HOST>:1080`（固定出口 IP=<DOMAIN> 公网 IP，已在公众号后台白名单）
+- `~/.config/wxmp/config.json`（600）：appid/secret/默认项/api_proxy（指向一个出口 IP 固定的内网代理，其公网出口 IP 已加入公众号后台白名单；具体地址见本机配置文件，勿提交到仓库）
 - `~/.config/wxmp/token.json`：token 缓存；`~/.cache/wxmp/materials.json`：封面 sha256→media_id 缓存
 - 用户文章在 `~/articles/`；`examples/demo.md` 是渲染回归样例（覆盖全部语法）
 
