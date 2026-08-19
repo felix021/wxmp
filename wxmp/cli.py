@@ -67,6 +67,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p_del = drafts_sub.add_parser("delete", help="删除草稿")
     p_del.add_argument("media_id")
 
+    p_send = sub.add_parser(
+        "send", help="群发草稿给粉丝（订阅号每天 1 次；不可撤回，草稿发后自动删除）")
+    p_send.add_argument("media_id", help="草稿 media_id（以 - 开头时前置 --），或 latest")
+    p_send.add_argument("--tag", type=int, help="发给指定标签用户（缺省发给全部粉丝）")
+
+    p_pub = sub.add_parser(
+        "publish", help="发布草稿到公众号主页（不推送粉丝、不占群发次数）")
+    p_pub.add_argument("media_id", help="草稿 media_id（以 - 开头时前置 --），或 latest")
+    p_pub.add_argument("--status", metavar="PUBLISH_ID", help="查询发布状态而非提交发布")
+
     p_themes = sub.add_parser("themes", help="列出可用主题")
     p_themes.add_argument("--code-styles", action="store_true",
                           help="列出 pygments 代码高亮样式")
@@ -180,6 +190,41 @@ def _cmd_drafts(args) -> int:
     return EXIT_OK
 
 
+def _resolve_media_id(client, media_id: str) -> str:
+    if media_id == "latest":
+        items = client.draft_batchget(offset=0, count=1).get("item", [])
+        if not items:
+            raise ConfigError("草稿箱为空，没有可用的草稿")
+        return items[0]["media_id"]
+    return media_id
+
+
+def _cmd_send(args) -> int:
+    cfg = load_config()
+    client = WeChatClient(cfg.appid, cfg.secret, api_proxy=cfg.api_proxy)
+    media_id = _resolve_media_id(client, args.media_id)
+    print(f"群发中 media_id={media_id} "
+          f"({'标签 ' + str(args.tag) if args.tag else '全部粉丝'})…")
+    data = client.mass_sendall(media_id, tag_id=args.tag)
+    print(f"群发任务已提交 msg_id={data['msg_id']}")
+    print("注意：仅代表任务提交成功；草稿已自动移出草稿箱；结果以公众号后台为准。")
+    return EXIT_OK
+
+
+def _cmd_publish(args) -> int:
+    cfg = load_config()
+    client = WeChatClient(cfg.appid, cfg.secret, api_proxy=cfg.api_proxy)
+    if args.status:
+        data = client.freepublish_get(args.status)
+        print(data)
+        return EXIT_OK
+    media_id = _resolve_media_id(client, args.media_id)
+    publish_id = client.freepublish_submit(media_id)
+    print(f"发布已提交 publish_id={publish_id}")
+    print(f"查询状态：wxmp publish latest --status={publish_id}")
+    return EXIT_OK
+
+
 def _cmd_themes(args) -> int:
     if args.code_styles:
         from wxmp.highlight import list_code_styles
@@ -222,6 +267,8 @@ _HANDLERS = {
     "push": _cmd_push,
     "preview": _cmd_preview,
     "drafts": _cmd_drafts,
+    "send": _cmd_send,
+    "publish": _cmd_publish,
     "themes": _cmd_themes,
     "config": _cmd_config,
 }

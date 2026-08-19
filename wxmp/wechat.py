@@ -191,3 +191,39 @@ class WeChatClient:
 
     def draft_delete(self, media_id: str) -> None:
         self._request("POST", "/cgi-bin/draft/delete", json_body={"media_id": media_id})
+
+    # ---- 发送 / 发布 ----
+
+    def mass_sendall(self, media_id: str, *, tag_id: int | None = None,
+                     clientmsgid: str | None = None) -> dict:
+        """群发图文给粉丝（订阅号每天 1 次）。
+
+        注意：仅认证账号可用；成功后草稿自动从草稿箱移除；
+        API 无定时参数，定时需本地调度。返回 {"msg_id", "msg_data_id"}。
+        """
+        body: dict = {
+            "filter": {"is_to_all": tag_id is None},
+            "mpnews": {"media_id": media_id},
+            "msgtype": "mpnews",
+        }
+        if tag_id is not None:
+            body["filter"]["tag_id"] = tag_id
+        if clientmsgid:
+            body["clientmsgid"] = clientmsgid  # 防重复：24h 内重复提交返回原 msg_id
+        data = self._request("POST", "/cgi-bin/message/mass/sendall", json_body=body)
+        if "msg_id" not in data:
+            raise WeChatError(-1, f"sendall 响应缺少 msg_id: {data}")
+        return data
+
+    def freepublish_submit(self, media_id: str) -> str:
+        """发布草稿（文章出现在公众号主页，不推送粉丝、不占群发次数）。"""
+        data = self._request("POST", "/cgi-bin/freepublish/submit",
+                             json_body={"media_id": media_id})
+        if "publish_id" not in data:
+            raise WeChatError(-1, f"freepublish/submit 响应缺少 publish_id: {data}")
+        return data["publish_id"]
+
+    def freepublish_get(self, publish_id: str) -> dict:
+        """查询发布状态：publish_status 0=成功 1=发布中 2+=失败原因。"""
+        return self._request("POST", "/cgi-bin/freepublish/get",
+                             json_body={"publish_id": publish_id})

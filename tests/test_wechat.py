@@ -98,6 +98,43 @@ def test_draft_update_single_article_object(tmp_path):
     assert body == {"media_id": "M", "index": 0, "articles": {"title": "t", "content": "c"}}
 
 
+def test_mass_sendall_body(tmp_path):
+    client = make_client(
+        tmp_path,
+        api_responses=[FakeResponse({"errcode": 0, "msg_id": 1000001,
+                                     "msg_data_id": 1000002})],
+    )
+    data = client.mass_sendall("M")
+    assert data["msg_id"] == 1000001
+    body = json.loads(client.session.request.call_args.kwargs["data"])
+    assert body["filter"] == {"is_to_all": True}
+    assert body["msgtype"] == "mpnews"
+    assert body["mpnews"] == {"media_id": "M"}
+
+    client2 = make_client(
+        tmp_path,
+        api_responses=[FakeResponse({"errcode": 0, "msg_id": 1})],
+    )
+    client2.mass_sendall("M", tag_id=101, clientmsgid="abc")
+    body2 = json.loads(client2.session.request.call_args.kwargs["data"])
+    assert body2["filter"] == {"is_to_all": False, "tag_id": 101}
+    assert body2["clientmsgid"] == "abc"
+
+
+def test_freepublish(tmp_path):
+    client = make_client(
+        tmp_path,
+        api_responses=[
+            FakeResponse({"errcode": 0, "publish_id": "P1"}),
+            FakeResponse({"errcode": 0, "publish_status": 0}),
+        ],
+    )
+    assert client.freepublish_submit("M") == "P1"
+    body = json.loads(client.session.request.call_args.kwargs["data"])
+    assert body == {"media_id": "M"}
+    assert client.freepublish_get("P1")["publish_status"] == 0
+
+
 def test_request_body_not_unicode_escaped(tmp_path):
     """微信要求 JSON 直接传 UTF-8（勿 \\uXXXX 转义，否则中文变字面转义文本）。"""
     client = make_client(
