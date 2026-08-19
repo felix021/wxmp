@@ -42,6 +42,9 @@ def _build_parser() -> argparse.ArgumentParser:
     add_common(p_push)
     p_push.add_argument("--no-digest", action="store_true",
                         help="不生成摘要，交给微信取正文前 54 字")
+    p_push.add_argument("--update", metavar="MEDIA_ID|latest",
+                        help="更新已有草稿（原地修改）而非新建；latest=最近一条草稿。"
+                             "media_id 以 - 开头，请用 --update=xxx 等号形式")
     p_push.add_argument("--dry-run", action="store_true",
                         help="完整渲染但不发起任何微信请求，输出汇总")
     p_push.add_argument("--output-content", metavar="PATH",
@@ -141,8 +144,18 @@ def _cmd_push(args) -> int:
 
     thumb = pipeline.ensure_thumb(client, built, path.parent, built.report)
     article = to_draft_article(m, built.content_html, thumb)
-    media_id = client.draft_add(article)
-    print(f"草稿已创建 media_id={media_id}")
+    if args.update:
+        target = args.update
+        if target == "latest":
+            items = client.draft_batchget(offset=0, count=1).get("item", [])
+            if not items:
+                raise ConfigError("草稿箱为空，没有可更新的草稿")
+            target = items[0]["media_id"]
+        client.draft_update(target, article)
+        print(f"草稿已更新 media_id={target}")
+    else:
+        media_id = client.draft_add(article)
+        print(f"草稿已创建 media_id={media_id}")
     print("请到 mp.weixin.qq.com → 草稿箱 查看，确认无误后手动发布。")
     return EXIT_OK
 

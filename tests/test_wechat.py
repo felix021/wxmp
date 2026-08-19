@@ -89,6 +89,15 @@ def test_non_json_response(tmp_path):
         client.draft_count()
 
 
+def test_draft_update_single_article_object(tmp_path):
+    """draft/update 的 articles 是单对象（非数组），用 media_id+index 定位。"""
+    client = make_client(tmp_path, api_responses=[FakeResponse({"errcode": 0})])
+    client.draft_update("M", {"title": "t", "content": "c"})
+    kwargs = client.session.request.call_args.kwargs
+    body = json.loads(kwargs["data"])
+    assert body == {"media_id": "M", "index": 0, "articles": {"title": "t", "content": "c"}}
+
+
 def test_request_body_not_unicode_escaped(tmp_path):
     """微信要求 JSON 直接传 UTF-8（勿 \\uXXXX 转义，否则中文变字面转义文本）。"""
     client = make_client(

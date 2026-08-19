@@ -174,6 +174,12 @@ class WeChatClient:
             raise WeChatError(-1, f"draft/add 响应缺少 media_id: {data}")
         return data["media_id"]
 
+    def draft_update(self, media_id: str, article: dict, index: int = 0) -> None:
+        """更新已有草稿。注意 articles 是单对象（与新增的数组不同），index 定位篇目。"""
+        self._request("POST", "/cgi-bin/draft/update",
+                      json_body={"media_id": media_id, "index": index,
+                                 "articles": article})
+
     def draft_count(self) -> int:
         return int(self._request("GET", "/cgi-bin/draft/count").get("total_count", 0))
 
