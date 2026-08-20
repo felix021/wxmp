@@ -94,3 +94,4 @@ HTML 文件同样支持，元数据走 CLI 参数。图片：本地路径/外链
 | `40125` | secret 错误或已重置 |
 | 草稿里中文变 `二` 转义文本 | 历史 bug 已修（JSON 必须 ensure_ascii=False）；若复现查 wechat.py 序列化 |
 | `drafts list` 乱码 | 历史 bug 已修（响应强制 utf-8 解码） |
+| 草稿在后台显示异常（空列表项/错乱）但 API 拉回 content 正常 | 草稿曾在后台编辑器打开过，编辑器派生状态已坏：**删除草稿重新 push 新建**（`--update` 覆盖 content 也治不好显示），新草稿即正常 |
