@@ -90,6 +90,16 @@ def validate(meta: ArticleMeta, content_html: str) -> list[str]:
     n_bytes = len(content_html.encode("utf-8"))
     if n_bytes > CONTENT_BYTES_MAX:
         raise ValidationError(f"正文 {n_bytes} 字节，超过微信上限 1MB")
+    # 未渲染的 ** 残留（代码块外）：CommonMark 中文坑——加粗以全角标点结尾
+    # 且后面紧跟汉字时（如 **…）**的）闭合失效，星号按字面输出
+    import re as _re
+
+    no_pre = _re.sub(r"<pre[^>]*>.*?</pre>", "", content_html, flags=_re.S)
+    if "**" in no_pre:
+        warnings.append(
+            "正文中存在未渲染的 ** 字面标记（通常是加粗以全角标点结尾后紧跟汉字，"
+            "如 **……）**的），请调整加粗边界"
+        )
     return warnings
 
 
