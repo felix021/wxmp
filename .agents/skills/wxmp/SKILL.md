@@ -82,6 +82,7 @@ HTML 文件同样支持，元数据走 CLI 参数。图片：本地路径/外链
 
 - 内置主题是纯 CSS（选择器支持 tag/.class/后代/子代/逗号组），自定义主题参考 `/home/felix021/code/weixin-mp/examples/custom-theme.css`
 - 主题 CSS 的 `pre` 背景要配 `code_style`：浅底配 default/friendly，暗底配 monokai
+- 中文加粗写法 `**……）**的`（全角标点结尾紧跟汉字）会被 CommonMark 按字面输出——工具已自动修复（渲染失败时把边界标点移出加粗重渲染），仍有残留时会警告；写文章时可不必特意避开
 - 体积紧张时的已知手段（已内置）：紧凑序列化、继承优化（li/td 字号颜色上移容器）；进一步要压就从内容下手
 
 ## 故障排查
