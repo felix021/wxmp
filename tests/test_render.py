@@ -53,7 +53,24 @@ def test_digest_byte_limit():
     assert make_digest("<p>short</p>", max_bytes=30) == "short"
 
 
-def test_compact_structural_whitespace():
+def test_cjk_flanking_autofix():
+    from wxmp.render import render_markdown
+
+    # 全角标点结尾 + 紧跟汉字 → 标点移出加粗，星号不再字面输出
+    out = render_markdown("**Qwen3.8-27B（UD-Q3_K_XL，13.4GB）**的实测", "default")
+    assert "<strong>Qwen3.8-27B（UD-Q3_K_XL，13.4GB</strong>）的实测" == out.split("<p>")[1].split("</p>")[0]
+    # 对称情况：汉字后紧跟 **“ → 开引号移到 ** 前
+    out2 = render_markdown("如**“引用内容”**所示", "default")
+    assert "“<strong>引用内容</strong>”" in out2
+    # 正常写法不受影响（幂等：fix 不触发或触发后等价）
+    out3 = render_markdown("**加粗**正常", "default")
+    assert "<strong>加粗</strong>正常" in out3
+    # 行内 code 里的 ** 不被改写
+    out4 = render_markdown("看 `**x）**y` 这个", "default")
+    assert "<code>**x）**y</code>" in out4
+    # 代码块内的 ** 不触发修复也不受影响
+    out5 = render_markdown("```\n**literal**\n```\n\n正文**ok**", "default")
+    assert "**literal**" in out5 and "<strong>ok</strong>" in out5
     # 块级标签之间的 \n 会被微信解析成空列表项，必须删掉
     out = sanitize_for_wechat("<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n<p>t</p>")
     assert out == '<ul><li>a</li><li>b</li></ul><p>t</p>'

@@ -66,7 +66,48 @@ def extract_front_matter(md_text: str) -> tuple[dict, str]:
 
 
 def render_markdown(body_md: str, code_style: str) -> str:
-    return build_md(code_style).render(body_md)
+    html = build_md(code_style).render(body_md)
+    if _has_stray_bold(html):
+        # CommonMark 中文坑：**……）**的 这类加粗（全角标点结尾 + 紧跟汉字，
+        # 或对称的 汉字**“……） 闭合/opening 失效）会把星号按字面输出。
+        # 只在检测到残留时自动把边界标点移出加粗再重渲染，正常内容零干预。
+        fixed = _fix_cjk_flanking(body_md)
+        if fixed != body_md:
+            html = build_md(code_style).render(fixed)
+    return html
+
+
+def _has_stray_bold(html: str) -> bool:
+    no_pre = re.sub(r"<pre[^>]*>.*?</pre>", "", html, flags=re.S)
+    return "**" in no_pre
+
+
+_CJK = "一-鿿"
+# 全角收尾标点（作 closer 需移出加粗）/ 全角起始标点（作 opener 需移出加粗）
+_CLOSE_PUNCT = "，。；：！？、）」』】”’"
+_OPEN_PUNCT = "（「『【“‘"
+
+
+def _fix_cjk_flanking(src: str) -> str:
+    close_pat = re.compile(
+        r"\*\*([^*\n]*?)([%s])\*\*(?=[%s])" % (re.escape(_CLOSE_PUNCT), _CJK)
+    )
+    open_pat = re.compile(
+        r"(?<=[%s])\*\*([%s])" % (_CJK, re.escape(_OPEN_PUNCT))
+    )
+    out, in_code = [], False
+    for i, chunk in enumerate(re.split(r"(`+)", src)):
+        if chunk.startswith("`"):
+            in_code = not in_code  # 粗略跟踪 code span，code 内不动
+            out.append(chunk)
+            continue
+        if in_code:
+            out.append(chunk)
+            continue
+        chunk = close_pat.sub(r"**\1**\2", chunk)
+        chunk = open_pat.sub(r"\1**", chunk)
+        out.append(chunk)
+    return "".join(out)
 
 
 def parse_user_html(html_text: str) -> str:
