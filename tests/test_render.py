@@ -53,6 +53,21 @@ def test_digest_byte_limit():
     assert make_digest("<p>short</p>", max_bytes=30) == "short"
 
 
+def test_compact_structural_whitespace():
+    # 块级标签之间的 \n 会被微信解析成空列表项，必须删掉
+    out = sanitize_for_wechat("<ul>\n<li>a</li>\n<li>b</li>\n</ul>\n<p>t</p>")
+    assert out == '<ul><li>a</li><li>b</li></ul><p>t</p>'
+    # 表格结构空白同样压缩
+    out2 = sanitize_for_wechat("<table>\n<thead>\n<tr>\n<th>h</th>\n</tr>\n</thead>\n</table>")
+    assert "\n" not in out2
+    # inline 标签之间的空格是文本分隔，必须保留
+    out3 = sanitize_for_wechat("<p>word1 <strong>b</strong> <em>c</em> end</p>")
+    assert "word1 <strong>b</strong> <em>c</em> end" in out3
+    # pre 内空白有语义，不动
+    out4 = sanitize_for_wechat("<pre><code>a\n  b</code></pre>")
+    assert "a\n  b" in out4
+
+
 def test_highlight_unknown_lang_fallback():
     from wxmp.render import render_markdown
 

@@ -96,6 +96,35 @@ def sanitize_soup(soup: BeautifulSoup) -> None:
         for attr in list(el.attrs):
             if attr not in _ATTR_WHITELIST:
                 del el.attrs[attr]
+    _compact_structural_whitespace(soup)
+
+
+# 块级标签：仅压缩"块级标签之间"的缩进/换行空白节点
+_BLOCK_TAGS = {
+    "p", "div", "section", "ul", "ol", "li", "table", "thead", "tbody",
+    "tfoot", "tr", "th", "td", "blockquote", "pre", "h1", "h2", "h3",
+    "h4", "h5", "h6", "hr", "figure", "figcaption",
+}
+
+
+def _compact_structural_whitespace(soup: BeautifulSoup) -> None:
+    """删除块级标签之间的纯空白文本节点（如 <ul>\\n<li> 里的 \\n）。
+
+    微信编辑器会把这些换行解析成空的列表项/空段落；
+    但 inline 标签之间的空白（<strong>a</strong> <em>b</em> 的空格）
+    是文本分隔不能删，<pre>/<code> 内空白有语义也不能删。
+    """
+    from bs4 import NavigableString, Tag
+
+    def block_or_none(x) -> bool:
+        return x is None or (isinstance(x, Tag) and x.name in _BLOCK_TAGS)
+
+    for s in soup.find_all(string=True):
+        if isinstance(s, NavigableString) and not s.strip():
+            if s.parent.name in ("pre", "code"):
+                continue
+            if block_or_none(s.previous_sibling) and block_or_none(s.next_sibling):
+                s.extract()
 
 
 def plain_text(html: str) -> str:
