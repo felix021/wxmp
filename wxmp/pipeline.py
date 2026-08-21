@@ -56,6 +56,11 @@ def build_article(path: Path, opts: dict, cfg: Config, client=None) -> BuiltArti
     report.extend(logs)
 
     theme_name = opts.get("theme") or fm.get("theme") or cfg.default_theme
+    # 主题相对路径与图片一致：相对文章文件所在目录解析
+    if theme_name and not Path(theme_name).is_absolute():
+        local = path.parent / theme_name
+        if local.exists():
+            theme_name = str(local)
     resolved_theme, css = themes.load_theme(theme_name)
     html_final = render.apply_theme(str(soup), css, on_warning=warnings.append)
     report.extend(f"主题警告: {w}" for w in warnings)

@@ -59,9 +59,9 @@ def test_cjk_flanking_autofix():
     # 全角标点结尾 + 紧跟汉字 → 标点移出加粗，星号不再字面输出
     out = render_markdown("**Qwen3.8-27B（UD-Q3_K_XL，13.4GB）**的实测", "default")
     assert "<strong>Qwen3.8-27B（UD-Q3_K_XL，13.4GB</strong>）的实测" == out.split("<p>")[1].split("</p>")[0]
-    # 对称情况：汉字后紧跟 **“ → 开引号移到 ** 前
-    out2 = render_markdown("如**“引用内容”**所示", "default")
-    assert "“<strong>引用内容</strong>”" in out2
+    # 合法的 closing（**加粗**（注释））不被误改——曾因对称修复被破坏
+    out2 = render_markdown("混合架构：**30 层 SSM + 10 层全注意力**（层索引 3,7,11）", "default")
+    assert "<strong>30 层 SSM + 10 层全注意力</strong>（层索引" in out2
     # 正常写法不受影响（幂等：fix 不触发或触发后等价）
     out3 = render_markdown("**加粗**正常", "default")
     assert "<strong>加粗</strong>正常" in out3
