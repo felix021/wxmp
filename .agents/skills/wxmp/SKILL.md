@@ -7,7 +7,7 @@ description: 推送 Markdown/HTML 文章到微信公众号草稿箱（wxmp CLI�
 
 wxmp 是本机的 Python CLI，把 Markdown/HTML 渲染成微信可用的**内联样式** HTML（微信会过滤 class/`<style>`/`<script>`），自动转传图片、上传封面，推送到草稿箱。
 
-- 可执行文件：`/home/felix021/code/weixin-mp/.venv/bin/wxmp`（源码同目录，下文简写 `wxmp`）
+- 可执行文件：仓库根目录下的 `.venv/bin/wxmp`（本 skill 即软链自该仓库的 `.agents/skills/wxmp/`；下文简写 `wxmp`）
 - 配置已就绪（`~/.config/wxmp/config.json`：appid/secret/api_proxy 固定出口 IP，白名单已配），**不要改动**
 - 发布永远由用户在 mp.weixin.qq.com 后台手动完成，工具只到草稿箱
 
@@ -80,7 +80,7 @@ HTML 文件同样支持，元数据走 CLI 参数。图片：本地路径/外链
 
 ## 排版定制
 
-- 内置主题是纯 CSS（选择器支持 tag/.class/后代/子代/逗号组），自定义主题参考 `/home/felix021/code/weixin-mp/examples/custom-theme.css`
+- 内置主题是纯 CSS（选择器支持 tag/.class/后代/子代/逗号组），自定义主题参考 `examples/custom-theme.css`（仓库根相对）
 - 主题 CSS 的 `pre` 背景要配 `code_style`：浅底配 default/friendly，暗底配 monokai
 - 中文加粗写法 `**……）**的`（全角标点结尾紧跟汉字）会被 CommonMark 按字面输出——工具已自动修复（渲染失败时把边界标点移出加粗重渲染），仍有残留时会警告；写文章时可不必特意避开
 - 体积紧张时的已知手段（已内置）：紧凑序列化、继承优化（li/td 字号颜色上移容器）；进一步要压就从内容下手
