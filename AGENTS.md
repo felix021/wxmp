@@ -7,7 +7,7 @@ wxmp：把 Markdown/HTML 文章推送到**微信公众号草稿箱**的 Python C
 - Python ≥3.10，venv 在 `.venv/`（重建：`python3 -m venv .venv && .venv/bin/pip install -e .`）
 - 一切命令走 `.venv/bin/wxmp`（下文简写 `wxmp`）
 - 测试：`.venv/bin/python -m pytest tests/`（40 个无网络单测；全绿是提交前提）
-- git：github.com/felix021/weixin-mp（private），分支 main，直接提交推送
+- git：github.com/felix021/wxmp（public），分支 main，直接提交推送
 
 ## 架构与数据流
 

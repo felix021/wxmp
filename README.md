@@ -28,7 +28,7 @@ wxmp push article.md --dry-run   # 完整渲染但不发任何请求，看汇总
 ## 安装
 
 ```bash
-git clone <repo> && cd weixin-mp
+git clone https://github.com/felix021/wxmp && cd wxmp
 pipx install .          # 推荐；或 pip install --user .
 # 开发：python3 -m venv .venv && .venv/bin/pip install -e . && .venv/bin/wxmp ...
 ```
