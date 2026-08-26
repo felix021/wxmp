@@ -40,6 +40,7 @@ wechat.py              WeChatClient：stable_token 本地缓存、40001/42001 �
 6. `mass/sendall` 无定时参数（定时要本地调度）；成功后**草稿自动删除**；订阅号每天 1 次（45028）。
 7. 网络双 session 策略相反，勿统一：微信 API `trust_env=False` + 可选 `api_proxy`（出口 IP 要配白名单）；外链图片下载 `trust_env=True`（走环境代理）。
 8. media_id 以 `-` 开头：argparse 需 `--update=<id>` 等号形式或位置参数前置 `--`。
+9. **代码块不能依赖原始空格、换行或 `white-space: pre-wrap`**：公众号后台预览/保存会重写 DOM，清空只含普通空格的 span，并折叠原始换行。代码文本必须用 NBSP 表示空格、`<br>` 表示换行，且不要重新引入纯空白高亮 span。
 
 ## 配置与数据（本机已就绪，勿动）
 

@@ -107,5 +107,25 @@ def test_highlighted_code_whitespace_survives_sanitize():
     code = "sudo apt-get install -y foo\nif true; then\n  echo ok\nfi\n"
     highlighted = render_markdown(f"```bash\n{code}```", "default")
     out = apply_theme(highlighted, "")
+    pre = BeautifulSoup(out, "html.parser").find("pre")
+    encoded = pre.decode_contents()
+    assert "<br" in encoded
+    assert "\u00a0" in encoded
+    assert not any(not span.get_text().strip() for span in pre.find_all("span"))
+    for br in pre.find_all("br"):
+        br.replace_with("\n")
+    assert pre.get_text().replace("\u00a0", " ") == code
 
-    assert BeautifulSoup(out, "html.parser").find("pre").get_text() == code
+
+def test_plain_code_whitespace_uses_wechat_safe_markup():
+    from bs4 import BeautifulSoup
+
+    from wxmp.render import render_markdown
+
+    code = "cmd --flag\n  indented\n"
+    out = render_markdown(f"```\n{code}```", "default")
+    pre = BeautifulSoup(out, "html.parser").find("pre")
+
+    assert len(pre.find_all("br")) == 2
+    assert "\u00a0" in pre.get_text()
+    assert "\n" not in pre.decode_contents()
