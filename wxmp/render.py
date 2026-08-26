@@ -160,7 +160,9 @@ def _compact_structural_whitespace(soup: BeautifulSoup) -> None:
 
     for s in soup.find_all(string=True):
         if isinstance(s, NavigableString) and not s.strip():
-            if s.parent.name in ("pre", "code"):
+            # Pygments 会把空格和换行包进带颜色的 span；只检查直接 parent
+            # 会把这些有语义的代码空白误当成结构空白删除。
+            if s.find_parent(("pre", "code")) is not None:
                 continue
             if block_or_none(s.previous_sibling) and block_or_none(s.next_sibling):
                 s.extract()

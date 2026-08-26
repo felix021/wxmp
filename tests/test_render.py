@@ -97,3 +97,15 @@ def test_highlight_inline_spans():
 
     out = render_markdown("```python\ndef f():\n    pass\n```", "default")
     assert "<span" in out and "color:#" in out
+
+
+def test_highlighted_code_whitespace_survives_sanitize():
+    from bs4 import BeautifulSoup
+
+    from wxmp.render import render_markdown
+
+    code = "sudo apt-get install -y foo\nif true; then\n  echo ok\nfi\n"
+    highlighted = render_markdown(f"```bash\n{code}```", "default")
+    out = apply_theme(highlighted, "")
+
+    assert BeautifulSoup(out, "html.parser").find("pre").get_text() == code
