@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wxmp"
-version = "0.1.1"
+version = "0.1.2"
 description = "把 Markdown/HTML 文章推送到微信公众号草稿箱的命令行工具"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
