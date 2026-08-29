@@ -67,7 +67,7 @@ def extract_front_matter(md_text: str) -> tuple[dict, str]:
 
 def render_markdown(body_md: str, code_style: str) -> str:
     html = build_md(code_style).render(body_md)
-    if _has_stray_bold(html):
+    if has_stray_bold(html):
         # CommonMark 中文坑：**……）**的（加粗以全角标点结尾 + 紧跟汉字）
         # 闭合失效会把星号按字面输出。检测到残留时自动把边界标点移出
         # 加粗再重渲染；若修复后残留未减少则回退（不引入新问题）。
@@ -79,9 +79,11 @@ def render_markdown(body_md: str, code_style: str) -> str:
     return html
 
 
-def _has_stray_bold(html: str) -> bool:
-    no_pre = re.sub(r"<pre[^>]*>.*?</pre>", "", html, flags=re.S)
-    return "**" in no_pre
+def has_stray_bold(html: str) -> bool:
+    """正文是否残留字面 **。pre 和行内 code 里的 ** 是内容本意，不算残留。"""
+    stripped = re.sub(r"<pre[^>]*>.*?</pre>", "", html, flags=re.S)
+    stripped = re.sub(r"<code[^>]*>.*?</code>", "", stripped, flags=re.S)
+    return "**" in stripped
 
 
 _CJK = "一-鿿"
