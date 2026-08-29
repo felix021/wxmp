@@ -23,6 +23,21 @@ def _escape_code_text(value: str) -> str:
     return escaped.replace(" ", "\u00a0").replace("\n", "<br/>")
 
 
+def _style_for_token(style, ttype):
+    """沿 token 父链回退查样式。
+
+    Style._styles 只覆盖 STANDARD_TYPES 和样式声明过的 token，YAML 等
+    lexer 动态创建的子类型（如 Token.Literal.Scalar.Plain）不在其中，
+    style_for_token 会直接 KeyError。
+    """
+    while ttype is not None:
+        try:
+            return style.style_for_token(ttype)
+        except KeyError:
+            ttype = ttype.parent
+    return {}
+
+
 class _InlineFormatter(Formatter):
     """把每个 token 渲染为 <span style="color:...;font-weight:...">text</span>。"""
 
@@ -34,7 +49,7 @@ class _InlineFormatter(Formatter):
             if value.isspace():
                 outfile.write(text)
                 continue
-            st = self.style.style_for_token(ttype)
+            st = _style_for_token(self.style, ttype)
             decl = []
             if st.get("color"):
                 decl.append(f"color:#{st['color'].lstrip('#')}")

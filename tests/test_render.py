@@ -99,6 +99,22 @@ def test_highlight_inline_spans():
     assert "<span" in out and "color:#" in out
 
 
+def test_highlight_dynamic_token_types():
+    from wxmp.render import render_markdown
+
+    # YAML lexer 会动态创建 Token.Literal.Scalar.Plain 等子类型，样式表未声明
+    out = render_markdown("```yaml\ncover: cover.png\ntheme: default\n```", "default")
+    assert "<pre><code>" in out and "cover.png" in out
+
+
+def test_stray_bold_ignores_code_spans():
+    from wxmp.render import has_stray_bold
+
+    assert not has_stray_bold('<p>字面 <code style="x">**</code> 是示例</p>')
+    assert not has_stray_bold("<pre><code>**</code></pre>")
+    assert has_stray_bold("<p>正文残留 ** 字面</p>")
+
+
 def test_highlighted_code_whitespace_survives_sanitize():
     from bs4 import BeautifulSoup
 
